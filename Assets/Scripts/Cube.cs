@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cube: MonoBehaviour
-{
+public class Cube : MonoBehaviour
+{   
     int[] _showFaces;
     Rubik _parent;
 
@@ -13,7 +13,7 @@ public class Cube: MonoBehaviour
         this._parent = parent;
         this.setColor();
         this.setScale(scale);
-        this.setPosition(scale * position + movemment, rotation);
+        this.setPosition((scale * position) + movemment, rotation);
         this.gameObject.transform.parent = transform;
     }
 
@@ -28,7 +28,7 @@ public class Cube: MonoBehaviour
         gameObject.transform.SetPositionAndRotation(position, rotation); 
     }
 
-    public void setColor()
+    void setColor()
     {
         Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;
         Vector3[] vertices = mesh.vertices;
@@ -42,14 +42,14 @@ public class Cube: MonoBehaviour
         {
             switch (k)
             {
-                case 0: color = containsFace(5) ? Color.red : Color.black; break;
-                case 4: color = containsFace(4) ? Color.white : Color.black; break;
-                case 6: color = containsFace(2) ? Color.green : Color.black; break;
-                case 8: color = containsFace(4) ? Color.white : Color.black; break;
-                case 10: color = containsFace(2) ? Color.green : Color.black; break;
-                case 12: color = containsFace(1) ? Color.blue : Color.black; break;
-                case 16: color = containsFace(0) ? Color.yellow : Color.black; break;
-                case 20: color = containsFace(3) ? Color.magenta : Color.black; break;
+                case 0: color = containsFace(Constants.FACE.BACK) ? Color.red : Color.black; break;
+                case 4: color = containsFace(Constants.FACE.DOWN) ? Color.white : Color.black; break;
+                case 6: color = containsFace(Constants.FACE.FRONT) ? Color.green : Color.black; break;
+                case 8: color = containsFace(Constants.FACE.DOWN) ? Color.white : Color.black; break;
+                case 10: color = containsFace(Constants.FACE.FRONT) ? Color.green : Color.black; break;
+                case 12: color = containsFace(Constants.FACE.UP) ? Color.blue : Color.black; break;
+                case 16: color = containsFace(Constants.FACE.LEFT) ? Color.yellow : Color.black; break;
+                case 20: color = containsFace(Constants.FACE.RIGHT) ? Color.magenta : Color.black; break;
             }
 
             colors[i] = color;
@@ -58,7 +58,7 @@ public class Cube: MonoBehaviour
         }
         mesh.SetColors(colors);
     }
-
+        
     bool containsFace(int face)
     {
      //   return true;
@@ -72,8 +72,40 @@ public class Cube: MonoBehaviour
         return false;
     }
 
-    public void rotate(Vector3 direction)
+    bool _mouseDown = false;
+    bool _mouseUp = true;
+
+    void Update()
     {
-        gameObject.transform.RotateAround(this._parent.gameObject.transform.position, direction, -5);
+        if (_mouseDown)
+        {
+            Vector3 currentSwipe = Swipe.getSwipe();
+            if (currentSwipe == Vector3.zero)
+            {
+                if (_mouseUp)
+                {
+                    _mouseDown = false;
+                    this._parent.setCubeClicked(false);
+                }
+            }
+            else
+            {
+                this._parent.createRotateRow(transform.position, currentSwipe);
+                _mouseDown = false;
+                this._parent.setCubeClicked(false);
+            }
+        }
+    }
+
+    private void OnMouseDown()
+    {
+        this._parent.setCubeClicked(true);
+        _mouseDown = true;
+        _mouseUp = false;
+    }
+
+    private void OnMouseUp()
+    {
+        _mouseUp = true;
     }
 }
