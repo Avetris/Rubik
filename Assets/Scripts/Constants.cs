@@ -14,5 +14,9 @@ public static class Constants
         public const int BACK = 5;
     };
 
+    public const int ROTATION_ANGLE = 90;
+    public const int ROTATION_SPEED = 15;
 
+    public const int MIN_SAMPLE_ITERATIONS = 200;
+    public const int LIMIT_SAMPLE_ITERATIONS = 1000;
 }

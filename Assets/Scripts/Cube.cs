@@ -9,12 +9,12 @@ public class Cube : MonoBehaviour
 
     public void setData(float scale, Vector3 position, Vector3 movemment, Quaternion rotation, Transform transform, int[] showFaces, Rubik parent)
     {
-        this._showFaces = showFaces;
-        this._parent = parent;
-        this.setColor();
-        this.setScale(scale);
-        this.setPosition((scale * position) + movemment, rotation);
-        this.gameObject.transform.parent = transform;
+        _showFaces = showFaces;
+        _parent = parent;
+        setColor();
+        setScale(scale);
+        setPosition((scale * position) + movemment, rotation);
+        gameObject.transform.parent = transform;
     }
 
     public void setScale(float scale)
@@ -61,8 +61,7 @@ public class Cube : MonoBehaviour
         
     bool containsFace(int face)
     {
-     //   return true;
-        foreach(int f in this._showFaces)
+        foreach(int f in _showFaces)
         {
             if(face == f)
             {
@@ -72,40 +71,10 @@ public class Cube : MonoBehaviour
         return false;
     }
 
-    bool _mouseDown = false;
-    bool _mouseUp = true;
-
-    void Update()
-    {
-        if (_mouseDown)
-        {
-            Vector3 currentSwipe = Swipe.getSwipe();
-            if (currentSwipe == Vector3.zero)
-            {
-                if (_mouseUp)
-                {
-                    _mouseDown = false;
-                    this._parent.setCubeClicked(false);
-                }
-            }
-            else
-            {
-                this._parent.createRotateRow(transform.position, currentSwipe);
-                _mouseDown = false;
-                this._parent.setCubeClicked(false);
-            }
-        }
-    }
-
     private void OnMouseDown()
     {
-        this._parent.setCubeClicked(true);
-        _mouseDown = true;
-        _mouseUp = false;
+        _parent.setCubeClicked(transform.position);
     }
 
-    private void OnMouseUp()
-    {
-        _mouseUp = true;
-    }
+    
 }

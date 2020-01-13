@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Rubik : MonoBehaviour
@@ -16,33 +15,26 @@ public class Rubik : MonoBehaviour
 
     GameObject[] _cubes;
 
-    bool _cubeClicked = false;
-    
-    GameObject[] _face;
-    GameObject _pivot;
+    bool _anyCubeClicked = false;
+    Vector3 _cubeClicked = Vector3.zero;
 
-    const float _angleSpeed = 15;
-    const float _initialAngle = 90;
+    GameObject[] _face = new GameObject[0];
+    GameObject _pivot;
 
     Vector3 _rotatingVector = Vector3.zero;
     float _angleLeft;
 
     private void Start()
     {
-
-        this._numberOfCubesFace = Mathf.RoundToInt(Mathf.Pow(this._columns, 2));
-        this._center = (_columns * _scale - _scale) / 2;
+        _numberOfCubesFace = Mathf.RoundToInt(Mathf.Pow(_columns, 2));
+        _center = (_columns * _scale - _scale) / 2;
     
         generateRubikCube(_numberOfCubesFace);
-        _face = new GameObject[_numberOfCubesFace];
 
-        transform.position = Camera.main.transform.position + Camera.main.transform.forward * _columns;
+        Camera.main.transform.position = transform.position - Camera.main.transform.forward * _columns;
         Camera.main.orthographicSize = _columns + 2;
-    }
 
-    public void setCubeClicked(bool clicked)
-    {
-        this._cubeClicked = clicked;
+        sample();
     }
 
     void generateRubikCube(int numberOfCubesFace)
@@ -55,14 +47,13 @@ public class Rubik : MonoBehaviour
         _cubes = new GameObject[numberOfCubes];
         int index = 0;
         List<int> faces = new List<int>();
-
-
-        this.gameObject.transform.localScale = new Vector3(_columns * _scale, _columns * _scale, _columns * _scale);
+        
+        gameObject.transform.localScale = new Vector3(_columns * _scale, _columns * _scale, _columns * _scale);
         _initialMovemment = new Vector3(
-            this.gameObject.transform.position.x - _center,
-            this.gameObject.transform.position.y - _center,
-            this.gameObject.transform.position.z - _center);
-
+            gameObject.transform.position.x - _center,
+            gameObject.transform.position.y - _center,
+            gameObject.transform.position.z - _center);
+        
         for (int z = 0; z < _columns; z++)
         {
             for (int y = 0; y < _columns; y++)
@@ -95,7 +86,7 @@ public class Rubik : MonoBehaviour
                         faces.Add(Constants.FACE.BACK);
                     }
                     _cubes[index] = Instantiate(c, new Vector3(x, y, z), Quaternion.identity);
-                    _cubes[index].GetComponent<Cube>().setData(_scale, new Vector3(x, y, z), _initialMovemment, Quaternion.identity, this.transform, faces.ToArray(), this);
+                    _cubes[index].GetComponent<Cube>().setData(_scale, new Vector3(x, y, z), _initialMovemment, Quaternion.identity, transform, faces.ToArray(), this);
 
                     index++;
                 }
@@ -103,96 +94,211 @@ public class Rubik : MonoBehaviour
         }
     }
 
-    
-    public void createRotateRow(Vector3 cube, Vector3 direction)
+    void sample()
     {
-        Vector3 currentCubePivot = Vector3.Scale(cube, direction);         
-        
+        int iterations = UnityEngine.Random.Range(Constants.MIN_SAMPLE_ITERATIONS, Constants.LIMIT_SAMPLE_ITERATIONS);
+        GameObject[] auxCubes = new GameObject[_numberOfCubesFace * 2 + ((_columns * (_columns - 2)) * 2) + (((_columns - 2) * (_columns - 2)) * 2)];
+
         int index = 0;
-
-        float minX = _columns * _scale, minY = minX, minZ = minX;
-        float maxX = -minX, maxY = -minY, maxZ = -minZ;
-        bool rowEmpty = true;
-
         foreach (GameObject c in _cubes)
         {
-            if (Vector3.Scale(c.transform.position, direction) == currentCubePivot)
+            Vector3 v = c.transform.position;
+            if(v.x == _initialMovemment.x || v.y == _initialMovemment.y || v.z == _initialMovemment.z ||
+                v.x == -_initialMovemment.x || v.y == -_initialMovemment.y || v.z == -_initialMovemment.z)
             {
-                _face[index] = c;
+                auxCubes[index] = c;
                 index++;
-
-                if (c.transform.position.x > maxX) maxX = c.transform.position.x;
-                else if (c.transform.position.x < minX) minX = c.transform.position.x;
-
-                if (c.transform.position.y > maxY) maxY = c.transform.position.y;
-                else if (c.transform.position.y < minY) minY = c.transform.position.y;
-
-                if (c.transform.position.z > maxZ) maxZ = c.transform.position.z;
-                else if (c.transform.position.z < minZ) minZ = c.transform.position.z;
-
-                rowEmpty = false;
             }
         }
-        if (!rowEmpty)
-        {
-            _pivot = new GameObject("Row");
-            _pivot.transform.position = new Vector3((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
-            _pivot.transform.parent = gameObject.transform;
 
-            // Attach elements of _face array to pivot
-            foreach (GameObject c in _face)
+        while (iterations > 0)
+        {
+            _cubeClicked = auxCubes[UnityEngine.Random.Range(0, auxCubes.Length - 1)].transform.position;
+            _rotatingVector = Vector3.zero;
+            switch (UnityEngine.Random.Range(0, 5))
             {
-                c.transform.parent = _pivot.transform;
+                case 0: _rotatingVector = Vector3.right; break;
+                case 1: _rotatingVector = Vector3.left; break;
+                case 2: _rotatingVector = Vector3.up; break;
+                case 3: _rotatingVector = Vector3.down; break;
+                case 4: _rotatingVector = Vector3.forward; break;
+                case 5: _rotatingVector = Vector3.back; break;
             }
-            _rotatingVector = direction;
-            _angleLeft = _initialAngle;
+            createRotateRow();
+            if (_pivot != null && _face != null && _face.Length == _numberOfCubesFace)
+            {
+                _pivot.transform.Rotate(_rotatingVector, Constants.ROTATION_ANGLE, Space.World);
+                removePivot();
+                iterations--;
+            }
         }
     }
-    
-    void Update()
-    {
-        if (!this._cubeClicked)
-        {
-            Vector3 currentSwipe = Swipe.getSwipe();
 
-            if (currentSwipe != Vector3.zero)
+    public void setCubeClicked(Vector3 cubeClicked)
+    {
+        if (!_anyCubeClicked)
+        {
+            _anyCubeClicked = true;
+            _cubeClicked = cubeClicked;
+        }
+    }
+ 
+    void createRotateRow()
+    {
+        if (_pivot == null && (_face == null || _face.Length == 0))
+        {
+            Vector3 currentCubePivot = Vector3.Scale(_cubeClicked, _rotatingVector);
+
+            int index = 0;
+            
+            int rowEmpty = _numberOfCubesFace;
+
+            float middle = _scale * _columns / 2;
+
+            _pivot = new GameObject("Row");
+            _pivot.transform.position = currentCubePivot * middle;
+            _pivot.transform.parent = gameObject.transform;
+
+            _face = new GameObject[_numberOfCubesFace];
+            foreach (GameObject c in _cubes)
             {
-                _rotatingVector = currentSwipe;
-                _angleLeft = _initialAngle;
+                if (Vector3.Scale(c.transform.position, _rotatingVector) == currentCubePivot)
+                {
+                    if (index < _face.Length)
+                    {
+                        c.transform.parent = _pivot.transform;
+                        _face[index] = c;
+                        index++;
+                    }
+                    rowEmpty--;
+                }
+            }
+            if (rowEmpty == 0)
+            {
+                _angleLeft = Constants.ROTATION_ANGLE;
+            }
+            else
+            {
+                if(_pivot != null)
+                {
+                    removePivot();
+                }
             }
         }
+    }
+
+    void rotate()
+    {
         if (_angleLeft > 0)
         {
             if (_pivot != null)
             {
-                _pivot.transform.Rotate(_rotatingVector, _angleSpeed, Space.World);
+                _pivot.transform.Rotate(_rotatingVector, Constants.ROTATION_SPEED, Space.World);
             }
             else if (_rotatingVector != Vector3.zero)
             {
-                transform.Rotate(_rotatingVector, _angleSpeed, Space.World);
+                transform.Rotate(_rotatingVector, Constants.ROTATION_SPEED, Space.World);
             }
 
-            if (_angleLeft - _angleSpeed <= 0)
+            _angleLeft -= Constants.ROTATION_SPEED;
+            if (_angleLeft <= 0)
             {
                 _angleLeft = 0;
-                _rotatingVector = Vector3.zero;
                 removePivot();
+                
+                if (isCompleted())
+                {
+                    Debug.Log("COMPLETED");
+                }
+                else
+                {
+                    Debug.Log("NOT COMPLETED");
+
+                }
             }
-            else
+        }
+    }
+
+    bool isCompleted()
+    {
+        int index = 0;
+        Vector3 nullVector = new Vector3(999, 999, 999);
+        Vector3[] rotation = new Vector3[6] {
+            nullVector,
+            nullVector,
+            nullVector,
+            nullVector,
+            nullVector,
+            nullVector
+        };
+
+        foreach (GameObject c in _cubes)
+        {
+            if (c.transform.position.x == -_initialMovemment.x) index = 0;
+            else if (c.transform.position.x == _initialMovemment.x) index = 1;
+            else if (c.transform.position.y == -_initialMovemment.y) index = 2;
+            else if (c.transform.position.y == _initialMovemment.y) index = 3;
+            else if (c.transform.position.z == -_initialMovemment.z) index = 4;
+            else if (c.transform.position.z == _initialMovemment.z) index = 5;
+
+            if (!checkEqualRotation(nullVector, rotation, index, c.transform.rotation)) return false;
+        }
+        return true;
+    }
+
+    bool checkEqualRotation(Vector3 nullVector, Vector3[] generalRotation, int index, Quaternion currentRotation)
+    {
+        if (generalRotation[index] == nullVector)
+        {
+            generalRotation[index].x = currentRotation.x;
+            generalRotation[index].y = currentRotation.y;
+            generalRotation[index].z = currentRotation.z;
+        }
+        return generalRotation[index].x == currentRotation.x && generalRotation[index].y == currentRotation.y && generalRotation[index].z == currentRotation.z;
+    }
+
+
+    void Update()
+    {
+        if (_angleLeft <= 0)
+        {
+            _rotatingVector = Swipe.getSwipe();
+            if (_rotatingVector != Vector3.zero)
             {
-                _angleLeft -= _angleSpeed;
+                if (_anyCubeClicked)
+                {
+                    createRotateRow();
+                }
+                else
+                {
+                    if (_rotatingVector != Vector3.zero)
+                    {
+                        _angleLeft = Constants.ROTATION_ANGLE;
+                    }
+                }
             }
+        }
+        rotate();
+    }
+
+    private void OnGUI()
+    {
+        if (GUI.Button(new Rect(20, 40, 200, 200), "Space"))
+        {
         }
     }
 
     void removePivot()
     {
         // Desatach elements of _face array from pivot
-        foreach (GameObject f in _face)
+        if(_face != null)
         {
-            if (f != null)
+            foreach (GameObject f in _face)
             {
-                f.transform.parent = transform;
+                if (f != null)
+                {
+                    f.transform.parent = transform;
+                }
             }
         }
 
@@ -200,7 +306,13 @@ public class Rubik : MonoBehaviour
         if (_pivot != null)
         {
             Destroy(_pivot);
+            _pivot = null;
         }
 
+        _face = new GameObject[0];
+
+        _rotatingVector = Vector3.zero;
+        _cubeClicked = Vector3.zero;
+        _anyCubeClicked = false;
     }
 }
