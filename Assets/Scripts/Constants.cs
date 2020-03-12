@@ -19,4 +19,12 @@ public static class Constants
 
     public const int MIN_SAMPLE_ITERATIONS = 200;
     public const int LIMIT_SAMPLE_ITERATIONS = 1000;
+
+    public const int MAX_RUBIK_SIZE = 5;
+    public const int MIN_RUBIK_SIZE = 2;
+
+    public enum SHARED_PREFERENCES
+    {
+        RUBIK_SIZE
+    }
 }

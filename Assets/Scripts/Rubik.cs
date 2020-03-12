@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Rubik : MonoBehaviour
 {
@@ -24,18 +25,41 @@ public class Rubik : MonoBehaviour
     Vector3 _rotatingVector = Vector3.zero;
     float _angleLeft;
 
+    bool _preview = false;
+
     private void Start()
     {
+        _preview = !SceneManager.GetActiveScene().name.Equals("GameScene");
+        if (!_preview) { 
+            _columns = PlayerPrefs.GetInt(Constants.SHARED_PREFERENCES.RUBIK_SIZE.ToString(), _columns);
+
+            _numberOfCubesFace = Mathf.RoundToInt(Mathf.Pow(_columns, 2));
+            _center = (_columns * _scale - _scale) / 2;
+
+            generateRubikCube(_numberOfCubesFace);
+
+            Camera.main.transform.position = transform.position - Camera.main.transform.forward * _columns;
+            Camera.main.orthographicSize = _columns + 2;
+
+            sample();
+        }
+    }
+
+    public void generateRubikPreview(int columns, float height)
+    {
+        _columns = columns;
+
         _numberOfCubesFace = Mathf.RoundToInt(Mathf.Pow(_columns, 2));
         _center = (_columns * _scale - _scale) / 2;
-    
+
         generateRubikCube(_numberOfCubesFace);
-
-        Camera.main.transform.position = transform.position - Camera.main.transform.forward * _columns;
-        Camera.main.orthographicSize = _columns + 2;
-
-        sample();
+        
+        Vector3 worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, height, 5));
+        transform.position = worldPoint;
+        transform.localScale /= columns;
+        transform.rotation = Quaternion.Euler(-39, 62, 40);
     }
+
 
     void generateRubikCube(int numberOfCubesFace)
     {
@@ -257,34 +281,39 @@ public class Rubik : MonoBehaviour
         return generalRotation[index].x == currentRotation.x && generalRotation[index].y == currentRotation.y && generalRotation[index].z == currentRotation.z;
     }
 
-
     void Update()
     {
-        if (_angleLeft <= 0)
+        if (!_preview)
         {
-            _rotatingVector = Swipe.getSwipe();
-            if (_rotatingVector != Vector3.zero)
+            if (_angleLeft <= 0)
             {
-                if (_anyCubeClicked)
+                _rotatingVector = Swipe.getSwipe();
+                if (_rotatingVector != Vector3.zero)
                 {
-                    createRotateRow();
-                }
-                else
-                {
-                    if (_rotatingVector != Vector3.zero)
+                    if (_anyCubeClicked)
                     {
-                        _angleLeft = Constants.ROTATION_ANGLE;
+                        createRotateRow();
+                    }
+                    else
+                    {
+                        if (_rotatingVector != Vector3.zero)
+                        {
+                            _angleLeft = Constants.ROTATION_ANGLE;
+                        }
                     }
                 }
             }
+            rotate();
         }
-        rotate();
     }
 
     private void OnGUI()
     {
-        if (GUI.Button(new Rect(20, 40, 200, 200), "Space"))
+        if (!_preview)
         {
+            if (GUI.Button(new Rect(20, 40, 200, 200), "Space"))
+            {
+            }
         }
     }
 

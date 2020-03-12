@@ -75,6 +75,4 @@ public class Cube : MonoBehaviour
     {
         _parent.setCubeClicked(transform.position);
     }
-
-    
 }
