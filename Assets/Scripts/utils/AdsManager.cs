@@ -10,7 +10,7 @@ public class AdsManager : MonoBehaviour
     public const string PP_TIME_KEY = "AdsTime";
     public const string PP_GAMES_TO_AD = "GamesToAd";
 
-    const int MAX_GAMES = 10;
+    const int MAX_GAMES = 5;
 
     public enum REWARDED_LOADED
     {
@@ -18,7 +18,6 @@ public class AdsManager : MonoBehaviour
         NON_LOAD
     }
 
-    public const bool TEST = true;
     #region SINGLETON
     protected static AdsManager _instance = null;
     public static AdsManager instance()
@@ -39,12 +38,17 @@ public class AdsManager : MonoBehaviour
     int _rewardedAmount = 0;
     bool _rewardedLoad = false;
 
+    bool showRealAds()
+    {
+        return !Application.isEditor && !Debug.isDebugBuild;
+    }
+
     private void Awake()
     {
         #if UNITY_ANDROID
-                string appId = TEST ? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-4136978037886351~7457426577";
+                string appId = !showRealAds() ? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-4136978037886351~7457426577";
         #elif UNITY_IPHONE
-               string appId = TEST ? "ca-app-pub-3940256099942544/2934735716" :  "ca-app-pub-4136978037886351~9568584599";
+               string appId = !showRealAds()? "ca-app-pub-3940256099942544/2934735716" :  "ca-app-pub-4136978037886351~9568584599";
         #else
                string appId = "unexpected_platform";
         #endif
@@ -83,9 +87,9 @@ public class AdsManager : MonoBehaviour
     public void requestBanner()
     {
         #if UNITY_ANDROID
-            string adUnitId = TEST ? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-4136978037886351/5259666315";
+            string adUnitId = !showRealAds() ? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-4136978037886351/5259666315";
         #elif UNITY_IPHONE
-            string adUnitId =  TEST ? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-4136978037886351/8993869520";
+            string adUnitId =  !showRealAds() ? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-4136978037886351/8993869520";
         #else
             string adUnitId = "unexpected_platform";
         #endif
@@ -102,10 +106,15 @@ public class AdsManager : MonoBehaviour
         {
             this._bannerView.Show();
         }
+        else
+        {
+            this._bannerView.Hide();
+        }
     }
 
     public void showBanner()
     {
+
         if (getRemainTime().Equals("0"))
         {
             if (this._bannerView == null)
@@ -131,9 +140,9 @@ public class AdsManager : MonoBehaviour
     private void requestInterstical()
     {
         #if UNITY_ANDROID
-            string adUnitId = TEST ? "ca-app-pub-3940256099942544/1033173712" : "ca-app-pub-4136978037886351/7572976646";
+            string adUnitId = !showRealAds() ? "ca-app-pub-3940256099942544/1033173712" : "ca-app-pub-4136978037886351/7572976646";
         #elif UNITY_IPHONE
-            string adUnitId =  TEST ? "ca-app-pub-3940256099942544/4411468910" : "ca-app-pub-4136978037886351/9582054701";
+            string adUnitId =  !showRealAds() ? "ca-app-pub-3940256099942544/4411468910" : "ca-app-pub-4136978037886351/9582054701";
         #else
             string adUnitId = "unexpected_platform";
         #endif
@@ -173,9 +182,9 @@ public class AdsManager : MonoBehaviour
     {
         _rewardedLoad = false;
         #if UNITY_ANDROID
-        string adUnitId = TEST ? "ca-app-pub-3940256099942544/5224354917" : "ca-app-pub-4136978037886351/3946584643";
+        string adUnitId = !showRealAds() ? "ca-app-pub-3940256099942544/5224354917" : "ca-app-pub-4136978037886351/3946584643";
         #elif UNITY_IPHONE
-             string adUnitId = TEST ? "ca-app-pub-3940256099942544/1712485313" : "ca-app-pub-4136978037886351/9537343742";
+             string adUnitId = !showRealAds() ? "ca-app-pub-3940256099942544/1712485313" : "ca-app-pub-4136978037886351/9537343742";
         #else
              string adUnitId = "unexpected_platform";
         #endif

@@ -1,0 +1,9 @@
+lastUpgrade=00964
+proj.pluginVersion=0.9.64
+proj.AppId=426355743202
+and.BundleId=com.avtdev.rubik
+proj.classDir=Assets
+proj.ConstantsClassName=GPGSIds
+and.ResourceData=%3c%3fxml+version%3d%221.0%22+encoding%3d%22utf-8%22%3f%3e%0d%0a%3c%21--%0d%0aGoogle+Play+game+services+IDs.%0d%0aSave+this+file+as+res%2fvalues%2fgames-ids.xml+in+your+project.%0d%0a--%3e%0d%0a%3cresources%3e%0d%0a++%3c%21--+app_id+--%3e%0d%0a++%3cstring+name%3d%22app_id%22+translatable%3d%22false%22%3e426355743202%3c%2fstring%3e%0d%0a++%3c%21--+package_name+--%3e%0d%0a++%3cstring+name%3d%22package_name%22+translatable%3d%22false%22%3ecom.avtdev.rubik%3c%2fstring%3e%0d%0a++%3c%21--+leaderboard+2x2+--%3e%0d%0a++%3cstring+name%3d%22leaderboard_2x2%22+translatable%3d%22false%22%3eCgkI4rOhprQMEAIQAQ%3c%2fstring%3e%0d%0a++%3c%21--+leaderboard+3x3+--%3e%0d%0a++%3cstring+name%3d%22leaderboard_3x3%22+translatable%3d%22false%22%3eCgkI4rOhprQMEAIQAg%3c%2fstring%3e%0d%0a++%3c%21--+leaderboard+4x4+--%3e%0d%0a++%3cstring+name%3d%22leaderboard_4x4%22+translatable%3d%22false%22%3eCgkI4rOhprQMEAIQAw%3c%2fstring%3e%0d%0a++%3c%21--+leaderboard+5x5+--%3e%0d%0a++%3cstring+name%3d%22leaderboard_5x5%22+translatable%3d%22false%22%3eCgkI4rOhprQMEAIQBA%3c%2fstring%3e%0d%0a%3c%2fresources%3e%0d%0a
+and.ClientId=426355743202-4bg53q6e2n2pv70arc54bpjju1jvbpva.apps.googleusercontent.com
+android.SetupDone=true

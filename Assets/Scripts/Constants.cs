@@ -22,6 +22,7 @@ public static class Constants
 
     public const int MAX_RUBIK_SIZE = 5;
     public const int MIN_RUBIK_SIZE = 2;
+    public const int TIME_LIMIT = 99999;
 
     public enum SHARED_PREFERENCES
     {

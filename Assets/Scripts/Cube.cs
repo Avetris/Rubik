@@ -17,6 +17,11 @@ public class Cube : MonoBehaviour
         gameObject.transform.parent = transform;
     }
 
+    public bool hasFaces()
+    {
+        return _showFaces != null && _showFaces.Length > 0;
+    }
+
     public void setScale(float scale)
     {
         gameObject.GetComponent<Transform>().localScale = new Vector3(scale, scale, scale);

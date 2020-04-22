@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Rubik : MonoBehaviour
 {
-
     public float _rotationSpeed = 0.5f;
 
     int _columns = 3;
@@ -27,11 +27,31 @@ public class Rubik : MonoBehaviour
 
     bool _preview = false;
 
+    GUISkin _gameSkin;
+    public Texture2D[] _icons;
+
+    float _time = 0;
+    int _menuEnabled = 0;
+    bool _build = false;
+    int _finished = 0;
+    Locale _locale;
+    AdsManager _adsManager;
+    LeaderboardManager.LEADERBOARD _currentLeaderboard = LeaderboardManager.LEADERBOARD.NONE; 
+
     private void Start()
     {
         _preview = !SceneManager.GetActiveScene().name.Equals("GameScene");
-        if (!_preview) { 
+        if (!_preview)
+        {
+            _build = false;
+            _adsManager = AdsManager.instance();
+            _locale = Locale.instance(Application.systemLanguage);
+            _gameSkin = Resources.Load<GUISkin>("Styles/gameSkin");
             _columns = PlayerPrefs.GetInt(Constants.SHARED_PREFERENCES.RUBIK_SIZE.ToString(), _columns);
+            if (_columns == 2) _currentLeaderboard = LeaderboardManager.LEADERBOARD.TWO;
+            else if (_columns == 3) _currentLeaderboard = LeaderboardManager.LEADERBOARD.THREE;
+            else if (_columns == 4) _currentLeaderboard = LeaderboardManager.LEADERBOARD.FOUR;
+            else if (_columns == 5) _currentLeaderboard = LeaderboardManager.LEADERBOARD.FIVE;
 
             _numberOfCubesFace = Mathf.RoundToInt(Mathf.Pow(_columns, 2));
             _center = (_columns * _scale - _scale) / 2;
@@ -42,7 +62,18 @@ public class Rubik : MonoBehaviour
             Camera.main.orthographicSize = _columns + 2;
 
             sample();
+            _build = true;
         }
+    }
+
+    void restart()
+    {
+        _build = false;
+        sample();
+        _menuEnabled = 0;
+        _finished = 0;
+        _time = 0;
+        _build = true;
     }
 
     public void generateRubikPreview(int columns, float height)
@@ -60,9 +91,12 @@ public class Rubik : MonoBehaviour
         transform.rotation = Quaternion.Euler(-39, 62, 40);
     }
 
-
     void generateRubikCube(int numberOfCubesFace)
     {
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
 
         GameObject c = Resources.Load("Prefabs/Cube", typeof(GameObject)) as GameObject;
 
@@ -126,9 +160,7 @@ public class Rubik : MonoBehaviour
         int index = 0;
         foreach (GameObject c in _cubes)
         {
-            Vector3 v = c.transform.position;
-            if(v.x == _initialMovemment.x || v.y == _initialMovemment.y || v.z == _initialMovemment.z ||
-                v.x == -_initialMovemment.x || v.y == -_initialMovemment.y || v.z == -_initialMovemment.z)
+            if (c.GetComponent<Cube>().hasFaces())
             {
                 auxCubes[index] = c;
                 index++;
@@ -232,12 +264,8 @@ public class Rubik : MonoBehaviour
                 
                 if (isCompleted())
                 {
-                    Debug.Log("COMPLETED");
-                }
-                else
-                {
-                    Debug.Log("NOT COMPLETED");
-
+                    LeaderboardManager.instance().setPuntuation(Mathf.RoundToInt(_time * 1000), _currentLeaderboard);
+                    _finished = 1;
                 }
             }
         }
@@ -245,65 +273,71 @@ public class Rubik : MonoBehaviour
 
     bool isCompleted()
     {
-        int index = 0;
-        Vector3 nullVector = new Vector3(999, 999, 999);
-        Vector3[] rotation = new Vector3[6] {
-            nullVector,
-            nullVector,
-            nullVector,
-            nullVector,
-            nullVector,
-            nullVector
-        };
+        if (!_build)
+        {
+            return false;
+        }
+        Quaternion rotation = _cubes[0].transform.rotation;
+        rotation.x = (float) Math.Round(rotation.x, 1);
+        rotation.y = (float)Math.Round(rotation.y, 1);
+        rotation.z = (float)Math.Round(rotation.z, 1);
+        rotation.w = (float)Math.Round(rotation.w, 1);
 
         foreach (GameObject c in _cubes)
         {
-            if (c.transform.position.x == -_initialMovemment.x) index = 0;
-            else if (c.transform.position.x == _initialMovemment.x) index = 1;
-            else if (c.transform.position.y == -_initialMovemment.y) index = 2;
-            else if (c.transform.position.y == _initialMovemment.y) index = 3;
-            else if (c.transform.position.z == -_initialMovemment.z) index = 4;
-            else if (c.transform.position.z == _initialMovemment.z) index = 5;
-
-            if (!checkEqualRotation(nullVector, rotation, index, c.transform.rotation)) return false;
+            Quaternion q = c.transform.rotation;
+            q.x = (float) Math.Round(q.x, 1);
+            q.y = (float)Math.Round(q.y, 1);
+            q.z = (float)Math.Round(q.z, 1);
+            q.w = (float)Math.Round(q.w, 1);
+            if (!(rotation.x == q.x
+            && rotation.y == q.y
+            && rotation.z == q.z
+            && rotation.w == q.w))
+            {
+                return false;
+            }
         }
         return true;
-    }
-
-    bool checkEqualRotation(Vector3 nullVector, Vector3[] generalRotation, int index, Quaternion currentRotation)
-    {
-        if (generalRotation[index] == nullVector)
-        {
-            generalRotation[index].x = currentRotation.x;
-            generalRotation[index].y = currentRotation.y;
-            generalRotation[index].z = currentRotation.z;
-        }
-        return generalRotation[index].x == currentRotation.x && generalRotation[index].y == currentRotation.y && generalRotation[index].z == currentRotation.z;
     }
 
     void Update()
     {
         if (!_preview)
         {
-            if (_angleLeft <= 0)
+            if (_menuEnabled == 0 && _finished == 0)
             {
-                _rotatingVector = Swipe.getSwipe();
-                if (_rotatingVector != Vector3.zero)
+                if (_time < Constants.TIME_LIMIT)
                 {
-                    if (_anyCubeClicked)
+                    _time += Time.deltaTime;
+                }
+                else
+                {
+                    _finished = -1;
+                }
+                if (_angleLeft <= 0)
+                {
+                    _rotatingVector = Swipe.getSwipe();
+                    if (_rotatingVector != Vector3.zero)
                     {
-                        createRotateRow();
-                    }
-                    else
-                    {
-                        if (_rotatingVector != Vector3.zero)
+                        if (_anyCubeClicked)
                         {
-                            _angleLeft = Constants.ROTATION_ANGLE;
+                            createRotateRow();
+                        }
+                        else
+                        {
+                            if (_rotatingVector != Vector3.zero)
+                            {
+                                _angleLeft = Constants.ROTATION_ANGLE;
+                            }
                         }
                     }
                 }
+                rotate();
+            }else if (_menuEnabled == 1)
+            {
+                _menuEnabled--;
             }
-            rotate();
         }
     }
 
@@ -311,9 +345,75 @@ public class Rubik : MonoBehaviour
     {
         if (!_preview)
         {
-            if (GUI.Button(new Rect(20, 40, 200, 200), "Space"))
+            GUI.backgroundColor = Color.white;
+            if (GUI.Button(new Rect(50, 50, Screen.width / 8, Screen.width / 8), "", _gameSkin.GetStyle("settings")))
             {
+                _menuEnabled = 2;
             }
+            GUI.Label(new Rect(60 + Screen.width / 8, 50, Screen.width - (60 + Screen.width / 8), Screen.width / 8), Mathf.RoundToInt(_time).ToString(), _gameSkin.GetStyle("time"));
+
+            if (_menuEnabled == 2)
+            {
+                GUI.backgroundColor = Color.blue;
+                GUI.Window(0, new Rect(Screen.width / 6, Screen.height / 5, 2 * Screen.width / 3, 2 * Screen.height / 5), ShowMenu, "", _gameSkin.window);
+            }
+            else if (_finished != 0)
+            {
+                GUI.backgroundColor = Color.blue;
+                GUI.Window(0, new Rect(Screen.width / 8, Screen.height / 5, 3 * Screen.width / 4, 2 * Screen.height / 5), ShowFinished, "", _gameSkin.window);
+            }
+
+        }
+    }
+    void ShowMenu(int windowID)
+    {
+        float width = 2 * Screen.width / 3;
+        float height = Screen.height / 2;
+        GUI.Label(new Rect(40, 40, width - 80, (height - 100) / 2), _locale.getWord("menu_text"), _gameSkin.GetStyle("menuText"));
+
+        float y = -60 + (height - 100) / 2;
+
+        GUI.backgroundColor = Color.green;
+        if (GUI.Button(new Rect(40, y, (width - 100) / 3, (height - 100) / 2), _icons[0], _gameSkin.button))
+        {
+            _menuEnabled = 1;
+        }
+
+        GUI.backgroundColor = Color.yellow;
+        if (GUI.Button(new Rect(50 + (width - 100) / 3, y, (width - 100) / 3, (height - 100) / 2), _icons[1], _gameSkin.button))
+        {
+            restart();
+            _adsManager.showInterstical();
+        }
+
+        GUI.backgroundColor = Color.red;
+        if (GUI.Button(new Rect(60 + (2 * (width - 100) / 3), y, (width - 100) / 3, (height - 100) / 2), _icons[2], _gameSkin.button))
+        {
+            SceneManager.LoadScene("MenuScene");
+            _adsManager.showInterstical();
+        }
+    }
+
+    void ShowFinished(int windowID)
+    {
+        float width = 3 * Screen.width / 4;
+        float height = Screen.height / 2;
+        GUI.Label(new Rect(40, 40, width - 80, (height - 100) / 2), _locale.getWord(_finished > 0 ? "rubik_finish" : "time_limit"), _gameSkin.GetStyle("menuText"));
+
+        float y = -60 + (height - 100) / 2;
+
+        GUI.backgroundColor = Color.yellow;
+        if (GUI.Button(new Rect(40 , y, (width - 100) / 3, (height - 100) / 2), _icons[1], _gameSkin.button))
+        {
+            restart();
+            _adsManager.showInterstical();
+        }
+
+        GUI.backgroundColor = Color.green;
+        if (GUI.Button(new Rect(40 + (2 * (width - 100) / 3), y, (width - 100) / 3, (height - 100) / 2), _icons[3], _gameSkin.button))
+        {
+            SceneManager.LoadScene("MenuScene");
+            _adsManager.showInterstical();
         }
     }
 

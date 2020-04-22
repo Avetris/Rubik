@@ -8,6 +8,9 @@
   "remove_ads": "Remove Ads for 2 hours",
   "back": "Back",
   "rubik_size": "Rubik Size",
+  "time_limit": "You have reach the time limit! Try it again!",
+  "rubik_finish": "Congratulations! You have managed to complete the RUBIK!",
+  "menu_text": "Are you sure you want to exit?",
   "en": "English",
   "es": "Spanish"
 }

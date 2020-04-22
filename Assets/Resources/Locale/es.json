@@ -8,6 +8,9 @@
   "remove_ads": "Eliminar Anuncios durante 2 horas",
   "back": "Atrás",
   "rubik_size": "Tamaño Rubik",
+  "time_limit": "¡Has alcanzado el límite de tiempo! ¡Vuelve a intentarlo!",
+  "rubik_finish": "¡Enorabuena! ¡Has conseguido completar el RUBIK!",
+  "menu_text": "¿Estás seguro que quieres salir?",
   "en": "Inglés",
   "es": "Español"
 }

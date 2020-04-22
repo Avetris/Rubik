@@ -35,6 +35,7 @@ public class Menu : MonoBehaviour
     GUIStyle _titleStyle;
     Locale _locale;
     AdsManager _adsManager;
+    LeaderboardManager _leaderboardManager;
     MenuState _current = MenuState.MENU;
 
     Dictionary<Texts, Rect> _rects = new Dictionary<Texts, Rect>();
@@ -50,6 +51,7 @@ public class Menu : MonoBehaviour
     {
         _adsManager = AdsManager.instance();
         _locale = Locale.instance(Application.systemLanguage);
+        _leaderboardManager = LeaderboardManager.instance();
 
         _titleStyle = new GUIStyle(_style);
         _titleStyle.fontSize = 200;
@@ -134,7 +136,7 @@ public class Menu : MonoBehaviour
         GUI.backgroundColor = Color.yellow;
         if (GUI.Button(_rects[Texts.LEADERBOARD], _locale.getWord("leaderboard"), _style))
         {
-            //_current = MenuState.GAME_SELECTION;
+            _leaderboardManager.showLeaderboard();
         }
         GUI.backgroundColor = Color.blue;
         if (GUI.Button(_rects[Texts.SETTINGS], _locale.getWord("settings"), _style))
