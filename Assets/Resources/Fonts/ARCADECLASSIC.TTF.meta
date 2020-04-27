@@ -8,9 +8,9 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: ArcadeClassic
+  fontName: Arcade Normal
   fontNames:
-  - ArcadeClassic
+  - Arcade Normal
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

@@ -14,4 +14,7 @@
 
     <application android:label="@string/app_name"
                  android:icon="@mipmap/app_icon"/>
+    <meta-data android:name="com.google.android.gms.games.APP_ID"
+      android:value="426355743202" />
+
 </manifest>
