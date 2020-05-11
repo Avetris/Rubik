@@ -24,10 +24,10 @@
 
 public static class GPGSIds
 {
-        public const string leaderboard_5x5 = "CgkI4rOhprQMEAIQBA"; // <GPGSID>
-        public const string leaderboard_2x2 = "CgkI4rOhprQMEAIQAQ"; // <GPGSID>
-        public const string leaderboard_3x3 = "CgkI4rOhprQMEAIQAg"; // <GPGSID>
-        public const string leaderboard_4x4 = "CgkI4rOhprQMEAIQAw"; // <GPGSID>
+        public const string leaderboard_5x5 = "CgkIvMyBn40REAIQBA"; // <GPGSID>
+        public const string leaderboard_2x2 = "CgkIvMyBn40REAIQAQ"; // <GPGSID>
+        public const string leaderboard_3x3 = "CgkIvMyBn40REAIQAg"; // <GPGSID>
+        public const string leaderboard_4x4 = "CgkIvMyBn40REAIQAw"; // <GPGSID>
 
 }
 

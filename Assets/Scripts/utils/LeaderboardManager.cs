@@ -20,12 +20,10 @@ public class LeaderboardManager
 
     private LeaderboardManager()
     {
-        PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-        .RequestServerAuthCode(false)
-        .RequestIdToken()
-        .Build();
+        var config = new PlayGamesClientConfiguration.Builder().Build();
         PlayGamesPlatform.InitializeInstance(config);
-        //PlayGamesPlatform.DebugLogEnabled = true;
+        if(Application.isEditor || Debug.isDebugBuild)
+            PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
         login(null);
     }
