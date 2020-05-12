@@ -75,9 +75,9 @@ public class Cube : MonoBehaviour
         }
         return false;
     }
-
+/*
     private void OnMouseDown()
     {
         _parent.setCubeClicked(transform.position);
-    }
+    }*/
 }

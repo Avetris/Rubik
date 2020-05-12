@@ -73,6 +73,8 @@ public class Rubik : MonoBehaviour
         _showingMenu = false;
         _time = 0;
         _build = true;
+        _pausePanel.SetActive(false);
+        _endPanel.SetActive(false);
     }
 
     public void generateRubikPreview(int columns, float height)
@@ -298,6 +300,28 @@ public class Rubik : MonoBehaviour
             }
         }
         return true;
+    }
+
+    private void Update()
+    {
+        int i = 0;
+        while (i < Input.touchCount)
+        {
+            if (Input.GetTouch(i).phase == TouchPhase.Began)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(i).position);
+                
+                RaycastHit hit;
+                if (Physics.Raycast(ray.origin, ray.direction, out hit, 10.0f))
+                {
+                    //RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.GetTouch(i).position), -Vector2.up);
+
+                    setCubeClicked(hit.collider.gameObject.transform.position);
+
+                }
+            }
+            ++i;
+        }
     }
 
     void FixedUpdate()
