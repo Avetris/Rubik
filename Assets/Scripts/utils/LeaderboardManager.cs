@@ -20,12 +20,14 @@ public class LeaderboardManager
 
     private LeaderboardManager()
     {
+    #if UNITY_ANDROID || UNITY_IPHONE
         var config = new PlayGamesClientConfiguration.Builder().Build();
         PlayGamesPlatform.InitializeInstance(config);
         if(Application.isEditor || Debug.isDebugBuild)
             PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
         login(null);
+    #endif
     }
 
     void login(System.Action<int, LEADERBOARD> callback, int score, LEADERBOARD leaderboard)
@@ -59,7 +61,7 @@ public class LeaderboardManager
 
     public void showLeaderboard()
     {
-        #if UNITY_ANDROID
+    #if UNITY_ANDROID || UNITY_IPHONE
             if (Social.localUser.authenticated)
             {
                 Social.ShowLeaderboardUI();
@@ -80,8 +82,8 @@ public class LeaderboardManager
             score = lastScore;
         }
         PlayerPrefs.SetInt(leaderboard.ToString(), score);
-
-        #if UNITY_ANDROID
+        
+    #if UNITY_ANDROID || UNITY_IPHONE
             string leaderboardString = "";
             switch (leaderboard)
             {

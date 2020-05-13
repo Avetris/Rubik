@@ -52,8 +52,8 @@ public class Cube : MonoBehaviour
                 case 6: color = containsFace(Constants.FACE.FRONT) ? Color.green : Color.black; break;
                 case 8: color = containsFace(Constants.FACE.DOWN) ? Color.white : Color.black; break;
                 case 10: color = containsFace(Constants.FACE.FRONT) ? Color.green : Color.black; break;
-                case 12: color = containsFace(Constants.FACE.UP) ? Color.blue : Color.black; break;
-                case 16: color = containsFace(Constants.FACE.LEFT) ? Color.yellow : Color.black; break;
+                case 12: color = containsFace(Constants.FACE.UP) ? Color.yellow : Color.black; break;
+                case 16: color = containsFace(Constants.FACE.LEFT) ? Color.blue : Color.black; break;
                 case 20: color = containsFace(Constants.FACE.RIGHT) ? Color.magenta : Color.black; break;
             }
 
@@ -75,9 +75,4 @@ public class Cube : MonoBehaviour
         }
         return false;
     }
-/*
-    private void OnMouseDown()
-    {
-        _parent.setCubeClicked(transform.position);
-    }*/
 }

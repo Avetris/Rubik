@@ -204,7 +204,10 @@ public class Rubik : MonoBehaviour
     {
         if (_pivot == null && (_face == null || _face.Length == 0))
         {
-            Vector3 currentCubePivot = Vector3.Scale(_cubeClicked, _rotatingVector);
+            Vector3 currentCubePivot = Vector3.Scale(_cubeClicked, _rotatingVector).normalized;
+            currentCubePivot.x = (float)Math.Round(currentCubePivot.x, 2);
+            currentCubePivot.y = (float)Math.Round(currentCubePivot.y, 2);
+            currentCubePivot.z = (float)Math.Round(currentCubePivot.z, 2);
 
             int index = 0;
             
@@ -219,7 +222,12 @@ public class Rubik : MonoBehaviour
             _face = new GameObject[_numberOfCubesFace];
             foreach (GameObject c in _cubes)
             {
-                if (Vector3.Scale(c.transform.position, _rotatingVector) == currentCubePivot)
+                Vector3 scale = Vector3.Scale(c.transform.position, _rotatingVector).normalized;
+                scale.x = (float)Math.Round(scale.x, 2);
+                scale.y = (float)Math.Round(scale.y, 2);
+                scale.z = (float)Math.Round(scale.z, 2);
+
+                if (scale == currentCubePivot)
                 {
                     if (index < _face.Length)
                     {
@@ -286,15 +294,17 @@ public class Rubik : MonoBehaviour
 
         foreach (GameObject c in _cubes)
         {
-            Quaternion q = c.transform.rotation;
-            q.x = (float) Math.Round(q.x, 1);
-            q.y = (float)Math.Round(q.y, 1);
-            q.z = (float)Math.Round(q.z, 1);
-            q.w = (float)Math.Round(q.w, 1);
-            if (!(rotation.x == q.x
-            && rotation.y == q.y
-            && rotation.z == q.z
-            && rotation.w == q.w))
+            Vector3 v1 = rotation.eulerAngles.normalized;
+            v1.x = (float) Math.Round(v1.x, 2);
+            v1.y = (float)Math.Round(v1.y, 2);
+            v1.z = (float)Math.Round(v1.z, 2);
+
+            Vector3 v2 = c.transform.rotation.eulerAngles.normalized;
+            v2.x = (float)Math.Round(v2.x, 2);
+            v2.y = (float)Math.Round(v2.y, 2);
+            v2.z = (float)Math.Round(v2.z, 2);
+
+            if (v1 != v2)
             {
                 return false;
             }
@@ -321,6 +331,13 @@ public class Rubik : MonoBehaviour
                 }
             }
             ++i;
+        }
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                showMenu(0);
+            }
         }
     }
 
@@ -359,12 +376,6 @@ public class Rubik : MonoBehaviour
                 }
                 rotate();
             }
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            showMenu(0);
         }
     }
 

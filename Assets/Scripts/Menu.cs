@@ -68,7 +68,6 @@ public class Menu : MonoBehaviour
         _adsManager.showBanner();
     }
 
-
     public void change(int type)
     {
         _menu.SetActive(false);
@@ -113,6 +112,24 @@ public class Menu : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {       
+                if (_menu.activeSelf)
+                {
+                    quit();
+                }
+                else
+                {
+                    change(0);
+                }
+            }
+        }
+    }
+
     private void FixedUpdate()
     {
         if (_settings.activeSelf)
@@ -122,18 +139,6 @@ public class Menu : MonoBehaviour
             _adsBtn.GetComponent<Image>().color = _rewardedLoaded.Equals(AdsManager.REWARDED_LOADED.LOAD.ToString()) ? Color.red : Color.gray;
             bool isRewarded = _rewardedLoaded.Equals(AdsManager.REWARDED_LOADED.LOAD.ToString()) || _rewardedLoaded.Equals(AdsManager.REWARDED_LOADED.NON_LOAD.ToString());
             _adsBtn.GetComponentInChildren<TextMeshProUGUI>().text = isRewarded ? _locale.getWord("remove_ads") : _rewardedLoaded;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (_menu.activeSelf)
-            {
-                quit();
-            }
-            else
-            {
-                change(0);
-            }
         }
     }
 
