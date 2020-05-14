@@ -29,5 +29,10 @@ public static class GPGSIds
         public const string leaderboard_3x3 = "CgkIvMyBn40REAIQAg"; // <GPGSID>
         public const string leaderboard_4x4 = "CgkIvMyBn40REAIQAw"; // <GPGSID>
 
+
+        public const string iphone_leaderboard_2x2 = "leaderboardId_2x2"; // <GPGSID>
+        public const string iphone_leaderboard_3x3 = "leaderboardId_3x3"; // <GPGSID>
+        public const string iphone_leaderboard_4x4 = "leaderboardId_4x4"; // <GPGSID>
+        public const string iphone_leaderboard_5x5 = "leaderboardId_5x5"; // <GPGSID>
 }
 

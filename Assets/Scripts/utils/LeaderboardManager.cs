@@ -20,13 +20,14 @@ public class LeaderboardManager
 
     private LeaderboardManager()
     {
-    #if UNITY_ANDROID || UNITY_IPHONE
+    #if UNITY_ANDROID
         var config = new PlayGamesClientConfiguration.Builder().Build();
         PlayGamesPlatform.InitializeInstance(config);
         if(Application.isEditor || Debug.isDebugBuild)
             PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
-        login(null);
+    #elif UNITY_IPHONE
+            login(null);
     #endif
     }
 
@@ -76,16 +77,13 @@ public class LeaderboardManager
 
     public void setPuntuation(int score, LEADERBOARD leaderboard)
     {
-        int lastScore = PlayerPrefs.GetInt(leaderboard.ToString(), score);
-        if (lastScore < score)
-        {
-            score = lastScore;
-        }
-        PlayerPrefs.SetInt(leaderboard.ToString(), score);
         
     #if UNITY_ANDROID || UNITY_IPHONE
             string leaderboardString = "";
-            switch (leaderboard)
+
+#if UNITY_ANDROID
+        score = score * 1000;
+        switch (leaderboard)
             {
                 case LEADERBOARD.TWO:
                     leaderboardString = GPGSIds.leaderboard_2x2;
@@ -100,7 +98,37 @@ public class LeaderboardManager
                     leaderboardString = GPGSIds.leaderboard_5x5;
                     break;
             }
-            if (leaderboardString.Length > 0)
+
+#elif UNITY_IPHONE
+
+        switch (leaderboard)
+            {
+                case LEADERBOARD.TWO:
+                    leaderboardString = GPGSIds.iphone_leaderboard_2x2;
+                    break;
+                case LEADERBOARD.THREE:
+                    leaderboardString = GPGSIds.iphone_leaderboard_3x3;
+                    break;
+                case LEADERBOARD.FOUR:
+                    leaderboardString = GPGSIds.iphone_leaderboard_4x4;
+                    break;
+                case LEADERBOARD.FIVE:
+                    leaderboardString = GPGSIds.iphone_leaderboard_5x5;
+                    break;
+            }
+
+#endif
+
+        Debug.Log("Leaderboard to insert: " + score);
+        int lastScore = PlayerPrefs.GetInt(leaderboard.ToString(), score);
+        Debug.Log("Last Leaderboard to insert: " + lastScore);
+        if (lastScore > score)
+        {
+            Debug.Log("ENTERED");
+            score = lastScore;
+        }
+        PlayerPrefs.SetInt(leaderboard.ToString(), score);
+        if (leaderboardString.Length > 0)
             {
                 if (Social.localUser.authenticated)
                 {

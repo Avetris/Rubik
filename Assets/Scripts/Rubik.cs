@@ -273,7 +273,7 @@ public class Rubik : MonoBehaviour
                 
                 if (isCompleted())
                 {
-                    LeaderboardManager.instance().setPuntuation(Mathf.RoundToInt(_time * 1000), _currentLeaderboard);
+                    LeaderboardManager.instance().setPuntuation(Mathf.RoundToInt(_time), _currentLeaderboard);
                     showMenu(1);
                 }
             }
@@ -286,20 +286,14 @@ public class Rubik : MonoBehaviour
         {
             return false;
         }
-        Quaternion rotation = _cubes[0].transform.rotation;
-        rotation.x = (float) Math.Round(rotation.x, 1);
-        rotation.y = (float)Math.Round(rotation.y, 1);
-        rotation.z = (float)Math.Round(rotation.z, 1);
-        rotation.w = (float)Math.Round(rotation.w, 1);
+        Vector3 v1 = _cubes[0].transform.rotation.eulerAngles;
+        v1.x = (float) Math.Round(v1.x, 1);
+        v1.y = (float)Math.Round(v1.y, 1);
+        v1.z = (float)Math.Round(v1.z, 1);
 
         foreach (GameObject c in _cubes)
         {
-            Vector3 v1 = rotation.eulerAngles.normalized;
-            v1.x = (float) Math.Round(v1.x, 2);
-            v1.y = (float)Math.Round(v1.y, 2);
-            v1.z = (float)Math.Round(v1.z, 2);
-
-            Vector3 v2 = c.transform.rotation.eulerAngles.normalized;
+            Vector3 v2 = c.transform.rotation.eulerAngles;
             v2.x = (float)Math.Round(v2.x, 2);
             v2.y = (float)Math.Round(v2.y, 2);
             v2.z = (float)Math.Round(v2.z, 2);
