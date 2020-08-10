@@ -12,7 +12,6 @@ public class Menu : MonoBehaviour
     [Tooltip("Game Canvas")]
     public GameObject _menu, _settings, _gameSelection;
     public GameObject _sizeBtn;
-    public GameObject _adsBtn;
 
     string _rewardedLoaded;
 
@@ -104,14 +103,6 @@ public class Menu : MonoBehaviour
         _leaderboardManager.showLeaderboard();
     }
 
-    public void removeAds()
-    {
-        if (_rewardedLoaded.Equals(AdsManager.REWARDED_LOADED.LOAD.ToString()))
-        {
-            _adsManager.showRewarded();
-        }
-    }
-
     private void Update()
     {
         if (Application.platform == RuntimePlatform.Android)
@@ -127,18 +118,6 @@ public class Menu : MonoBehaviour
                     change(0);
                 }
             }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (_settings.activeSelf)
-        {
-            _rewardedLoaded = _adsManager.isRewardedLoaded();
-
-            _adsBtn.GetComponent<Image>().color = _rewardedLoaded.Equals(AdsManager.REWARDED_LOADED.LOAD.ToString()) ? Color.red : Color.gray;
-            bool isRewarded = _rewardedLoaded.Equals(AdsManager.REWARDED_LOADED.LOAD.ToString()) || _rewardedLoaded.Equals(AdsManager.REWARDED_LOADED.NON_LOAD.ToString());
-            _adsBtn.GetComponentInChildren<TextMeshProUGUI>().text = isRewarded ? _locale.getWord("remove_ads") : _rewardedLoaded;
         }
     }
 
